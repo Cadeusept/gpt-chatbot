@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.10.7-management
+    hostname: rabbitmq
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=rmq_dev
+      - RABBITMQ_DEFAULT_PASS=password
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit disk_free_limit 2147483648 #for rabbit not to crash mem 2 Gbit
+    volumes:
+      - ./rabbitmq:/var/lib/rabbitmq
+      - ./init/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./init/definitions.json:/etc/rabbitmq/definitions.json:ro
+    ports:
+      - "5673:5672"
+      - "15672:15672"
+    networks:
+      gpt-chatbot-network:
+        aliases:
+          - rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  integrator:
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile
+    container_name: integrator
+    env_file:
+      - ./../.env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    working_dir: /app
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app
+    networks:
+      gpt-chatbot-network:
+        aliases:
+          - integrator
+
+networks:
+  gpt-chatbot-network:
+    name: gpt-chatbot-network
+    driver: bridge
