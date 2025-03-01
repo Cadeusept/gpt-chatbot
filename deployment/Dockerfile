@@ -9,4 +9,4 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 COPY ../ /app/
 
 ENV PYTHONPATH=/app
-CMD ["python", "cmd/main.py"]
+CMD ["python", "cmd/integrator_main.py"]
