@@ -1,13 +1,30 @@
+from DeeperSeek import DeepSeek
 import re
-import openai
-
+import asyncio
 
 class Client:
-    def __init__(self, api_key: str, model_name: str = "gpt-4-vision-preview"):
-        self.client = openai.OpenAI(api_key=api_key)
-        self.model_name = model_name
+    def __init__(self,  email: str, password: str, model_name: str = "deepseek-vision"):
+        """
+        Инициализация клиента DeepSeek.
 
-    def analyze_content(self, text: str, image: str) -> dict:
+        :param api_key: API ключ для доступа к DeepSeek API.
+        :param model_name: Название модели, используемой для анализа (по умолчанию "deepseek-vision").
+        """
+        self.email = email
+        self.password = password
+        self.model_name = model_name
+        self.client = DeepSeek(email = "email@email.com", password = "password", verbose = False) # Инициализация клиента DeepSeek
+
+    async def analyze_content(self, text: str, image: str) -> dict:
+        """
+        Анализирует текст и изображение с помощью DeepSeek API.
+
+        :param text: Текст для анализа.
+        :param image: Ссылка на изображение.
+        :return: Словарь с результатами анализа.
+        """
+        await self.client.initialize()
+
         prompt = (
             "Далее будет текст и фото о романе Льва Николаевича Толстого 'Анна Каренина'. "
             "Нужно ответить, правда это или ложь, затем обосновать свой ответ, а затем указать степень уверенности в процентах. "
@@ -22,19 +39,17 @@ class Client:
             f"Текст: {text}\nФото: {image}"
         )
 
-        response = self.client.chat.completions.create(
-            model=self.model_name,
-            messages=[
-                {"role": "system", "content": "Ты эксперт по литературе."},
-                {"role": "user", "content": prompt}
-            ]
-        )
+        # Формируем запрос к DeepSeek API
+        response = await self.client.send_message(prompt, slow_mode = True, deepthink = False, search = False, slow_mode_delay = 0.25)
+        print(response.text, response.chat_id)
 
-        reply = response.choices[0].message.content.strip().split("\n")
+        # Обрабатываем ответ
+        reply = response.text.strip().split("\n")
 
         if len(reply) < 3:
             raise ValueError("Ответ от модели не соответствует ожидаемому формату.")
 
+        # Извлекаем вердикт, обоснование и уверенность
         verdict = reply[0].strip().lower() == "правда"
         reason = reply[1].strip()
         confidence_match = re.search(r"\d+", reply[2])
@@ -48,16 +63,16 @@ class Client:
         }
 
 
-# Пример использования
-if __name__ == "__main__":
-    api_key = "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"
-    client = Client(api_key)
+async def aboba():
+    email = "lolpistol1337@gmail.com"  # Замените на ваш API ключ
+    password = "<PASSWORD>"
+    client = Client(email, password)
 
     text = "Александр Вронский испытывал беспокойство за брата, но знал, что тот видел в Анне ту единственную женщину, которая могла понять глубину его чувств."
-    image_base64 = "https://i.yapx.ru/Ygw0G.jpg"  # Здесь должно быть base64 изображение
+    image_base64 = "https://i.yapx.ru/Ygw0G.jpg"  # Замените на реальные данные изображения
 
     try:
-        result = client.analyze_content(text, image_base64)
+        result = await client.analyze_content(text, image_base64)
         print("Результат анализа:")
         print(f"Модель: {result['model_name']}")
         print(f"Вердикт: {'Правда' if result['verdict'] else 'Ложь'}")
@@ -65,3 +80,7 @@ if __name__ == "__main__":
         print(f"Уверенность: {result['confidence']}%")
     except Exception as e:
         print(f"Произошла ошибка: {e}")
+
+# Пример использования
+if __name__ == "__main__":
+     asyncio.run(aboba())
