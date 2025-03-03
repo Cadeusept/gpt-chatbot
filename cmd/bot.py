@@ -6,12 +6,19 @@ import json
 from internal.config import *
 from internal.handlers.mq.rmq import MQ
 
-# Настройка логирования
+
+class Response:
+    model_name: str = None
+    verdict: str = None
+    reason: str = None
+    confidence: str = None
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-# Инициализация Pyrogram клиента
+
 app = Client("my_bot", api_id=API_ID, api_hash=API_HASH)
 mq = MQ(RABBITMQ_HOST, RABBITMQ_USER, RABBITMQ_PASSWORD)
+
 TARGET_CHAT_ID = 1111111
 
 # Функция для отправки сообщений в RabbitMQ

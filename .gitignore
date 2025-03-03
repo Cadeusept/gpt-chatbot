@@ -4,3 +4,4 @@ deployment/rabbitmq
 *.env
 
 **/__pycache__/
+.env
