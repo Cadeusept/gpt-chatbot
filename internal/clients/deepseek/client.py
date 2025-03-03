@@ -13,7 +13,7 @@ class Client:
         self.email = email
         self.password = password
         self.model_name = model_name
-        self.client = DeepSeek(email = "email@email.com", password = "password", verbose = False) # Инициализация клиента DeepSeek
+        self.client = DeepSeek(email = email, password = password, verbose = True, chrome_args=['--no-sandbox', '--disable-gpu'], headless = True, attempt_cf_bypass = True) # Инициализация клиента DeepSeek
 
     async def analyze_content(self, text: str, image: str) -> dict:
         """
@@ -23,6 +23,7 @@ class Client:
         :param image: Ссылка на изображение.
         :return: Словарь с результатами анализа.
         """
+        # self.client.browser
         await self.client.initialize()
 
         prompt = (
@@ -61,26 +62,3 @@ class Client:
             "reason": reason,
             "confidence": confidence
         }
-
-
-async def aboba():
-    email = "lolpistol1337@gmail.com"  # Замените на ваш API ключ
-    password = "<PASSWORD>"
-    client = Client(email, password)
-
-    text = "Александр Вронский испытывал беспокойство за брата, но знал, что тот видел в Анне ту единственную женщину, которая могла понять глубину его чувств."
-    image_base64 = "https://i.yapx.ru/Ygw0G.jpg"  # Замените на реальные данные изображения
-
-    try:
-        result = await client.analyze_content(text, image_base64)
-        print("Результат анализа:")
-        print(f"Модель: {result['model_name']}")
-        print(f"Вердикт: {'Правда' if result['verdict'] else 'Ложь'}")
-        print(f"Обоснование: {result['reason']}")
-        print(f"Уверенность: {result['confidence']}%")
-    except Exception as e:
-        print(f"Произошла ошибка: {e}")
-
-# Пример использования
-if __name__ == "__main__":
-     asyncio.run(aboba())

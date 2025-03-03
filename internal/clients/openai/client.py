@@ -1,9 +1,10 @@
 import re
 import openai
+from pprint import pprint
 
 
 class Client:
-    def __init__(self, api_key: str, model_name: str = "gpt-4-vision-preview"):
+    def __init__(self, api_key: str, model_name: str = "gpt-4o-mini"):
         self.client = openai.OpenAI(api_key=api_key)
         self.model_name = model_name
 
@@ -57,6 +58,9 @@ if __name__ == "__main__":
     image_base64 = "https://i.yapx.ru/Ygw0G.jpg"  # Здесь должно быть base64 изображение
 
     try:
+        result = client.client.models.list()
+        pprint('Доступные модели:', result)
+
         result = client.analyze_content(text, image_base64)
         print("Результат анализа:")
         print(f"Модель: {result['model_name']}")
