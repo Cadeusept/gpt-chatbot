@@ -1,5 +1,5 @@
+import asyncio
 import json
-from dotenv import load_dotenv
 import os
 import base64
 
@@ -9,24 +9,6 @@ import internal.clients.deepseek.client as deepseek
 
 from internal.config import *
 # Загрузка переменных окружения
-load_dotenv()
-
-# Конфигурация RabbitMQ
-RABBITMQ_HOST = os.getenv('RABBITMQ_HOST', 'localhost')
-RABBITMQ_USER = os.getenv('RABBITMQ_USER', 'guest')
-RABBITMQ_PASSWORD = os.getenv('RABBITMQ_PASSWORD', 'guest')
-INPUT_QUEUE = os.getenv('INPUT_QUEUE', 'input_queue')
-OUTPUT_EXCHANGE = os.getenv('OUTPUT_EXCHANGE', 'output_exchange')
-
-RESULT_ROUTING_KEY = os.getenv('RESULT_ROUTING_KEY', 'result')
-
-# Конфигурация OpenAI
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-
-# Конфигурация DeepSeek
-DEEPSEEK_EMAIL = os.getenv('DEEPSEEK_EMAIL')
-DEEPSEEK_PASSWORD = os.getenv('DEEPSEEK_PASSWORD')
-
 
 import base64
 
@@ -49,17 +31,17 @@ def process_message(ch, method, properties, body):
     image_url = decode_base64(image_base64)
     text = message.get("text", "")
 
-    openaiClient = oai.Client(OPENAI_API_KEY)
-    result = openaiClient.analyze_content(text, image_url)
-    result["id"] = message["id"]
-
-    mq = rmq.MQ(RABBITMQ_HOST, RABBITMQ_USER, RABBITMQ_PASSWORD)
-    mq.publish(OUTPUT_EXCHANGE, RESULT_ROUTING_KEY, result)
-
-    # deepseekClient = deepseek.Client(DEEPSEEK_EMAIL, DEEPSEEK_PASSWORD)
-    # result = await deepseekClient.analyze_content(text, image_url)
+    # openaiClient = oai.Client(OPENAI_API_KEY)
+    # result = openaiClient.analyze_content(text, image_url)
     # result["id"] = message["id"]
+    #
+    mq = rmq.MQ(RABBITMQ_HOST, RABBITMQ_USER, RABBITMQ_PASSWORD)
     # mq.publish(OUTPUT_EXCHANGE, RESULT_ROUTING_KEY, result)
+
+    deepseekClient = deepseek.Client(DEEPSEEK_EMAIL, DEEPSEEK_PASSWORD)
+    result = asyncio.run(deepseekClient.analyze_content(text, image_url))
+    result["id"] = message["id"]
+    mq.publish(OUTPUT_EXCHANGE, RESULT_ROUTING_KEY, result)
 
     mq.close()
 
