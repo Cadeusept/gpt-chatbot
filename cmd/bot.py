@@ -45,7 +45,7 @@ async def fetch_chat_history(chat_id: int):
             logger.info(f"Fetched and sent message: {message.text}")
 
 # Обработчик новых сообщений в беседе
-@app.on_message(filters.chat(TARGET_CHAT_ID)
+@app.on_message(filters.chat(TARGET_CHAT_ID))
 def handle_new_message(client: Client, message: Message):
     chat_title = message.chat.title
     user_name = message.from_user.first_name if message.from_user else "Unknown"
