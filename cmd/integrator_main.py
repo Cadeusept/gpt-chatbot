@@ -7,6 +7,7 @@ import internal.handlers.mq.rmq as rmq
 import internal.clients.openai.client as oai
 import internal.clients.deepseek.client as deepseek
 
+from internal.config import *
 # Загрузка переменных окружения
 load_dotenv()
 
@@ -59,7 +60,7 @@ def process_message(ch, method, properties, body):
     # result = await deepseekClient.analyze_content(text, image_url)
     # result["id"] = message["id"]
     # mq.publish(OUTPUT_EXCHANGE, RESULT_ROUTING_KEY, result)
-    
+
     mq.close()
 
     ch.basic_ack(delivery_tag=method.delivery_tag)

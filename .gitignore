@@ -1,5 +1,6 @@
 .idea
-
+venv
 deployment/rabbitmq
-
 *.env
+
+**/__pycache__/

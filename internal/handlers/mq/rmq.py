@@ -2,11 +2,16 @@ import json
 
 import pika
 
+from internal.config import INPUT_QUEUE, OUTPUT_EXCHANGE
+
+
 class MQ:
     def __init__(self, host: str, username: str, password: str):
         self.credentials = pika.PlainCredentials(username, password)
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=host, credentials=self.credentials))
         self.channel = self.connection.channel()
+        self.channel.queue_declare(queue=INPUT_QUEUE)
+        self.channel.queue_declare(queue=OUTPUT_EXCHANGE)
 
     def publish(self, exchange: str, routing_key: str, message: dict):
         self.channel.basic_publish(exchange=exchange, routing_key=routing_key, body=json.dumps(message).encode('utf-8'))
