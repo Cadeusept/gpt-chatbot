@@ -16,6 +16,7 @@ RABBITMQ_USER = os.getenv('RABBITMQ_USER', 'guest')
 RABBITMQ_PASSWORD = os.getenv('RABBITMQ_PASSWORD', 'guest')
 INPUT_QUEUE = os.getenv('INPUT_QUEUE', 'input_queue')
 OUTPUT_EXCHANGE = os.getenv('OUTPUT_EXCHANGE', 'output_exchange')
+
 RESULT_ROUTING_KEY = os.getenv('RESULT_ROUTING_KEY', 'result')
 
 # Конфигурация OpenAI
@@ -58,7 +59,7 @@ def process_message(ch, method, properties, body):
     # result = await deepseekClient.analyze_content(text, image_url)
     # result["id"] = message["id"]
     # mq.publish(OUTPUT_EXCHANGE, RESULT_ROUTING_KEY, result)
-
+    
     mq.close()
 
     ch.basic_ack(delivery_tag=method.delivery_tag)
