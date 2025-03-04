@@ -28,7 +28,10 @@ def decode_base64(encoded_str: str) -> str:
 def process_message(ch, method, properties, body):
     message = json.loads(body)
     image_base64 = message.get("image", "")
-    image_url = decode_base64(image_base64)
+    try:
+        image_url = decode_base64(image_base64)
+    except:
+        image_url = ""
     text = message.get("text", "")
 
     # openaiClient = oai.Client(OPENAI_API_KEY)

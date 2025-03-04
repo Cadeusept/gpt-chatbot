@@ -1,6 +1,6 @@
 from DeeperSeek import DeepSeek
 import re
-import asyncio
+browser_executable_path = "/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
 
 class Client:
     def __init__(self,  email: str, password: str, model_name: str = "deepseek-vision"):
@@ -41,7 +41,8 @@ class Client:
         )
 
         # Формируем запрос к DeepSeek API
-        response = await self.client.send_message(prompt, slow_mode = True, deepthink = False, search = False, slow_mode_delay = 0.25)
+        response = await self.client.send_message(prompt, slow_mode = True, deepthink = False, search = False,
+                                                  slow_mode_delay = 0.25, browser_executable_path=browser_executable_path)
         print(response.text, response.chat_id)
 
         # Обрабатываем ответ

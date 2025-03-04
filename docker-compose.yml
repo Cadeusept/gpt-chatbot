@@ -1,0 +1,21 @@
+version: '3.7'
+
+services:
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    hostname: $RABBITMQ_HOST
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+      RABBITMQ_DEFAULT_USER: $RABBITMQ_USER
+      RABBITMQ_DEFAULT_PASS: $RABBITMQ_PASSWORD
+      RABBITMQ_DEFAULT_VHOST: "/"
+    volumes:
+      - ./docker-data/rabbitmq/etc/definitions.json:/etc/rabbitmq/definitions.json
+      - ./docker-data/rabbitmq/etc/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - ./docker-data/rabbitmq/data:/var/lib/rabbitmq/mnesia/rabbit@my-rabbit
+      - ./docker-data/rabbitmq/logs:/var/log/rabbitmq/log
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    labels:
+      NAME: "rabbitmq"
